@@ -15,41 +15,32 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public List<Employee> getEmployees(){
+    public List<Employee> getAllEmployees(){
         return employeeService.getEmployees();
     }
 
     @PostMapping
     public void registerNewEmployee(@RequestBody Employee employee){
-         return repository.save(newEmployee);
+         employeeService.addNewEmployee(employee);
     }
 
     // Single Item
 
-    @GetMapping("/employees/{id}")
-    Employee one(@PathVariable Long id){
-        return repository.findById(id)
-                .orElseThrow(() -> new EmployeeNotFoundException(id));
+    @GetMapping(path = "{id}")
+    Employee getOneEmployee(@PathVariable("id") Long id){
+      return employeeService.getEmployee(id);
     }
 
-    @PutMapping("/employees/{id}")
-    Employee updateEmployee(@RequestBody Employee newEmployee, @PathVariable Long id){
-        return repository.findById(id)
-                .map(employee -> {
-                    employee.setName(newEmployee.getName());
-                    employee.setRole(newEmployee.getRole());
-                    employee.setEmail(newEmployee.getEmail());
-                    employee.setDob(newEmployee.getDob());
-                    return repository.save(employee);
-                })
-                .orElseGet(() -> {
-                    newEmployee.setId(id);
-                    return repository.save(newEmployee);
-                });
+    @DeleteMapping(path = "{id}")
+    void deleteEmployee(@PathVariable("id") Long id){
+        employeeService.deleteEmployee(id);
     }
 
-    @DeleteMapping("/employees/{id}")
-    void deleteEmployee(@PathVariable Long id){
-        repository.deleteById(id);
+    @PutMapping(path = "{id}")
+    Employee updateEmployee(@RequestBody Employee newEmployee, @PathVariable Long id) {
+        return employeeService.updateEmployee(newEmployee, id);
     }
+
+
+
 }
