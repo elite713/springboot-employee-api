@@ -1,26 +1,39 @@
 package com.employeeApi.employee;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.Objects;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table
 public class Employee {
+    @Id
+    @SequenceGenerator(
+            name = "Employee_sequence",
+            sequenceName = "employee_sequence"
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "employee_sequence"
+    )
 
-    private @Id @GeneratedValue Long id;
+
+    private Long id;
     private String name;
     private String role;
     private String email;
     private LocalDate dob;
+    @Transient
+    private Integer age;
 
     public Employee() {
     }
 
-    public Employee(String name, String role, String email, LocalDate dob) {
+    public Employee(String name,
+                    String role,
+                    String email,
+                    LocalDate dob) {
         this.name = name;
         this.role = role;
         this.email = email;
@@ -42,6 +55,9 @@ public class Employee {
     public LocalDate getDob(){
         return this.dob = dob;
     }
+    public Integer getAge(){ return Period.between(this.dob, LocalDate.now()).getYears(); }
+
+
     public void setId(Long id){
         this.id = id;
     }
@@ -51,12 +67,11 @@ public class Employee {
     public void setRole(String role){
         this.role = role;
     }
-    public void setEmail(String email){
-
-    }
+    public void setEmail(String email){ this.email = email;}
     public void setDob(LocalDate dob){
         this.dob = dob;
     }
+    public void setAge(Integer age){this.age = age; }
 
     @Override
     public boolean equals(Object o) {
@@ -72,7 +87,7 @@ public class Employee {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, role, email, dob);
+        return Objects.hash(id, name, role, email, dob, age);
     }
 
     @Override
@@ -83,6 +98,7 @@ public class Employee {
                 ", role='" + role + '\'' +
                 ", email='" + email + '\'' +
                 ", dob=" + dob +
+                ", age=" + age +
                 '}';
     }
 }

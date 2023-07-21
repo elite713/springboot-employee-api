@@ -3,7 +3,7 @@ package com.employeeApi.employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,20 +41,25 @@ public class EmployeeService {
         boolean exists = employeeRepository.existsById(employeeId);
         if(!exists){
             throw new EmployeeNotFoundException(
-                    "Employee with id " + employeeId + "doesn't exists"
+                    "Employee with id " + employeeId + " doesn't exists "
             );
         }
         employeeRepository.deleteById(employeeId);
     }
 
-    //public void updateEmployee(Long employeeId, String name, String email, LocalDate dob){
     public Employee updateEmployee(Employee employeeUpdate, Long employeeId){
 
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EmployeeNotFoundException("Employee with id: " + employeeId + "does not exists"));
 
-        if(employeeUpdate.getName()!= null && employeeUpdate.getName().length() > 0 && !Objects.equals(employee.getName(), employeeUpdate.getName())){
+        if(employeeUpdate.getName() !=null && employeeUpdate.getName().length() > 0 &&
+                !Objects.equals(employee.getName(), employeeUpdate.getName())){
             employee.setName(employeeUpdate.getName());
+        }
+
+        if(employeeUpdate.getRole() !=null && employeeUpdate.getRole().length() > 0 &&
+                !Objects.equals(employee.getRole(), employeeUpdate.getRole())){
+            employee.setRole(employeeUpdate.getRole());
         }
 
         if(employeeUpdate.getEmail() !=null && employeeUpdate.getEmail().length() > 0 && !Objects.equals(employee.getEmail(), employeeUpdate.getEmail())){
@@ -68,7 +73,7 @@ public class EmployeeService {
         if(employeeUpdate.getDob() !=null && !Objects.equals(employee.getDob(),employeeUpdate.getDob()) ){
             employee.setDob(employeeUpdate.getDob());
         }
-        return employeeRepository.save(employee) ;
+       return employeeRepository.save(employee) ;
     }
 
 }

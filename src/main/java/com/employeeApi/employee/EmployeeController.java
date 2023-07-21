@@ -10,7 +10,7 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @Autowired
-    EmployeeController(EmployeeService employeeService){
+    public EmployeeController(EmployeeService employeeService){
         this.employeeService = employeeService;
     }
 
@@ -32,7 +32,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping(path = "{id}")
-    void deleteEmployee(@PathVariable("id") Long id){
+    public void deleteEmployee(@PathVariable("id") Long id){
         employeeService.deleteEmployee(id);
     }
 
@@ -40,7 +40,4 @@ public class EmployeeController {
     Employee updateEmployee(@RequestBody Employee newEmployee, @PathVariable Long id) {
         return employeeService.updateEmployee(newEmployee, id);
     }
-
-
-
 }
