@@ -1,8 +1,14 @@
 package com.employeeApi.employee;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.*;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping(path = "api/v2/employees")
@@ -15,9 +21,21 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public List<Employee> getAllEmployees(){
-        return employeeService.getEmployees();
+    CollectionModel<EntityModel<Employee>> getAllEmployees(){
+       List<EntityModel<Employee>> allEmployees = employeeService.getEmployees().stream()
+                .map(employee -> EntityModel.of(employee,
+                        linkTo(methodOn(EmployeeController.class).getOneEmployee(employee.getId())).withSelfRel(),
+                        linkTo(methodOn(EmployeeController.class).getAllEmployees()).withRel("employees")))
+                .collect(Collectors.toList());
+
+            return CollectionModel.of(allEmployees,
+                    linkTo(methodOn(EmployeeController.class).getAllEmployees()).withSelfRel());
     }
+
+
+
+
+
 
     @PostMapping
     public void registerNewEmployee(@RequestBody Employee employee){
@@ -27,8 +45,13 @@ public class EmployeeController {
     // Single Item
 
     @GetMapping(path = "{id}")
-    Employee getOneEmployee(@PathVariable("id") Long id){
-      return employeeService.getEmployee(id);
+    EntityModel<Employee> getOneEmployee(@PathVariable("id") Long id){
+
+       Employee employee = employeeService.getEmployee(id);
+
+       return EntityModel.of(employee,
+            linkTo(methodOn(EmployeeController.class).getOneEmployee(id)).withSelfRel(),
+                linkTo(methodOn(EmployeeController.class).getAllEmployees()).withRel("employees"));
     }
 
     @DeleteMapping(path = "{id}")
