@@ -15,27 +15,23 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class EmployeeController {
     private final EmployeeService employeeService;
 
+    private final EmployeeModelAssembler assembler;
+
     @Autowired
-    public EmployeeController(EmployeeService employeeService){
+    public EmployeeController(EmployeeService employeeService, EmployeeModelAssembler assembler){
         this.employeeService = employeeService;
+        this.assembler = assembler;
     }
 
     @GetMapping
     CollectionModel<EntityModel<Employee>> getAllEmployees(){
        List<EntityModel<Employee>> allEmployees = employeeService.getEmployees().stream()
-                .map(employee -> EntityModel.of(employee,
-                        linkTo(methodOn(EmployeeController.class).getOneEmployee(employee.getId())).withSelfRel(),
-                        linkTo(methodOn(EmployeeController.class).getAllEmployees()).withRel("employees")))
+                .map(assembler::toModel)
                 .collect(Collectors.toList());
 
             return CollectionModel.of(allEmployees,
                     linkTo(methodOn(EmployeeController.class).getAllEmployees()).withSelfRel());
     }
-
-
-
-
-
 
     @PostMapping
     public void registerNewEmployee(@RequestBody Employee employee){
@@ -49,9 +45,7 @@ public class EmployeeController {
 
        Employee employee = employeeService.getEmployee(id);
 
-       return EntityModel.of(employee,
-            linkTo(methodOn(EmployeeController.class).getOneEmployee(id)).withSelfRel(),
-                linkTo(methodOn(EmployeeController.class).getAllEmployees()).withRel("employees"));
+       return assembler.toModel(employee);
     }
 
     @DeleteMapping(path = "{id}")

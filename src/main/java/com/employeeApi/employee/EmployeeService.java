@@ -23,6 +23,10 @@ public class EmployeeService {
     }
 
     public Employee getEmployee(Long id){
+        return getEmployeeById(id);
+    }
+
+    private Employee getEmployeeById(Long id) {
         return employeeRepository.findById(id)
                 .orElseThrow(() -> new EmployeeNotFoundException(id));
     }
@@ -49,8 +53,7 @@ public class EmployeeService {
 
     public Employee updateEmployee(Employee employeeUpdate, Long employeeId){
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee with id: " + employeeId + "does not exists"));
+        Employee employee = getEmployeeById(employeeId);
 
         if(employeeUpdate.getName() !=null && employeeUpdate.getName().length() > 0 &&
                 !Objects.equals(employee.getName(), employeeUpdate.getName())){
