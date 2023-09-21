@@ -3,7 +3,6 @@ package com.employeeApi.employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,25 +21,22 @@ public class EmployeeService {
         return employeeRepository.findAll();
     }
 
-    public Employee getEmployee(Long id){
-        return getEmployeeById(id);
-    }
-
-    private Employee getEmployeeById(Long id) {
+    public Employee getEmployeeById(Long id) {
         return employeeRepository.findById(id)
                 .orElseThrow(() -> new EmployeeNotFoundException(id));
     }
 
-    public void addNewEmployee(Employee employee){
+    public Employee addNewEmployee(Employee employee){
 
         Optional<Employee>  employeeOptional = employeeRepository.findEmployeeByEmail(employee.getEmail());
 
         if(employeeOptional.isPresent()){
             throw new EmployeeNotFoundException("Email not found");
         }
-        employeeRepository.save(employee);
-        System.out.println((employee));
+        return employeeRepository.save(employee);
+
     }
+
     public void deleteEmployee(Long employeeId){
         boolean exists = employeeRepository.existsById(employeeId);
         if(!exists){
@@ -51,9 +47,9 @@ public class EmployeeService {
         employeeRepository.deleteById(employeeId);
     }
 
-    public Employee updateEmployee(Employee employeeUpdate, Long employeeId){
+    public Employee updateEmployee(Employee employeeUpdate, Long Id){
 
-        Employee employee = getEmployeeById(employeeId);
+        Employee employee = getEmployeeById(Id);
 
         if(employeeUpdate.getName() !=null && employeeUpdate.getName().length() > 0 &&
                 !Objects.equals(employee.getName(), employeeUpdate.getName())){
@@ -78,5 +74,22 @@ public class EmployeeService {
         }
        return employeeRepository.save(employee) ;
     }
+
+//    public void sendEmail(String to, String name, String subject, String message){
+//
+//        emailService.send(to,name,subject,message);
+//
+//    }
+
+//    public String sendEmail(String to, String name, String subject, String message){
+//
+//        try {
+//            emailService.send(to,name,subject,message);
+//        }catch(Exception e) {
+//            return "fail";
+//        }
+//        return "ok";
+//    }
+
 
 }
